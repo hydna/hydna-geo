@@ -155,6 +155,7 @@ $(function(){
     channel.onmessage = function(evt){
         try{
             var msg = JSON.parse(evt.data);
+            console.log(msg);
             say(msg.id, msg.msg);
         }catch(e){}
     }

@@ -33,7 +33,7 @@ behavior('/', {
         var pos = event.connection.geo;
         
         var pos_list = [];
-        pos_list.push("old_"+event.connection.id);
+        pos_list.push(event.connection.id);
         pos_list.push(pos.longitude);
         pos_list.push(pos.latitude);
         pos_list.push(pos.city);
