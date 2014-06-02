@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hydna geo-location demo</title>
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    
+    <link rel="stylesheet" href="style/master.css" type="text/css" media="screen" />
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="script/libs/consolelog.min.js"></script>
+<script type="text/javascript"
+                src="http://cdnjs.cloudflare.com/ajax/libs/hydna/1.0.0/hydna.js"></script>
+    <script src="script/app.js"></script>
+</head>
+<body>
+    <div id="logo"><a href="http://www.hydna.com/"><img src="images/logo.png"></a></div>
+    <div id="desc" >This is a demo app to illustrate our <a href="http://hydna.com/documentation/#geo-location">geo-location functionality.</a></div>
+    <div id="map"></div>
+    <div id="info">
+        <ul>
+            <li class="me">- You</li>
+            <li class="active">- Active visitor</li>
+            <li class="old">- Archived visitor</li>
+        </ul>
+    </div>
+
+    <div id="chat-container" >
+        <form id="chat-form">
+            <input type="text" name="chat" id="chat-id" placeholder="Your message to the world" ><button type="submit">Send</button>
+        </form>
+    </div>
+
+</body>
+</html>
