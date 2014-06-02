@@ -33,7 +33,7 @@ a:hover{
     z-index: 10;
 }
 #map{
-    background:url(../images/map.min-3.png) no-repeat 0 0;
+    background:url(../images/map.min.png) no-repeat 0 0;
     position: relative;
     overflow:hidden;
     display: inline-block;
