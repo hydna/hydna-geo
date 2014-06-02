@@ -109,19 +109,27 @@ $(function(){
     }
 
     function remove_marker(id){
-        $("#"+id).remove();
+
+        var marker_id = containedIn(id);
+        $("#"+marker_id).remove();
     }
 
-    function say(id, what){
+
+    function containedIn(id){
         var marker_id = id;
         for(var i = 0; i < markers.length; i++){
             for(var j = 0; j < markers[i].contains; j++){
                 if(id === markers[i].contains[j]){
-                    marker_id = markers[i].id;
-                    break;
+                    return markers[i].id;
                 }
             }
         }
+
+        return marker_id;
+    }
+
+    function say(id, what){
+        var marker_id = containedIn(id);
         var item = $("<li>- "+what+"</li>").fadeIn().delay(3500).slideUp(300, function(){ $(this).remove();});
         $("#"+marker_id+" ul").append(item);
     }
@@ -167,7 +175,7 @@ $(function(){
                     }
                 break;
                 case "join":
-                    add_marker(msg.id, msg.latitude, msg.longitude, msg.country, msg.city, "me");
+                    add_marker(msg.id, msg.latitude, msg.longitude, msg.country, msg.city, "active");
                 break;
                 case "leave":
                     remove_marker(msg.id);
