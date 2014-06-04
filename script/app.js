@@ -370,7 +370,8 @@ $(function(){
             line.removeClass("active");
         }, 3500);
 
-        var item = $("<li><span>- " + what + "</span></li>").hide().fadeIn(300).delay(3500).slideUp(300, function(){$(this).remove();});
+        var message = what.replace(/<([^>]+)>/g,'');
+        var item = $("<li><span>- " + message + "</span></li>").hide().fadeIn(300).delay(3500).slideUp(300, function(){$(this).remove();});
         $("ul", zone.bubble).append(item);
     }
 
@@ -439,7 +440,9 @@ $(function(){
         
         if(channel.readyState === HydnaChannel.OPEN){ 
             if(chat_input.val().length > 0){
-                channel.send(JSON.stringify({id:me, msg:chat_input.val()}));
+
+                var message = chat_input.val().replace(/<([^>]+)>/g,'');
+                channel.send(JSON.stringify({id:me, msg:message}));
                 chat_input.val("");
             }
         }
