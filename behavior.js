@@ -64,7 +64,7 @@ behavior('/', {
                     if(err){
                         console.log(err);
                     }
-                    event.channel.emit(JSON.stringify({type:"active", items:items}));    
+                    event.channel.emit(JSON.stringify({type:"active", items:items}), event.connection);    
                 });
                 
             break;

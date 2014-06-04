@@ -148,9 +148,14 @@ a:hover{
 
 }
 
+#activity{
+    font-size: 14px;
+    padding: 10px;
+}
+
 .point{
     text-align: left;
-    opacity: 0;
+
     position: absolute;
     width: 10px;
     height:16px;
@@ -178,6 +183,9 @@ a:hover{
     -ms-transform: translateZ(0);
     -o-transform: translateZ(0);
     transform: translateZ(0);
+    
+    opacity: 0;
+
 }
 
 .point.placed{

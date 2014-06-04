@@ -7,15 +7,19 @@ $(function(){
 
     var map = $("#map");
     var marker_container = $("#markers");
+    var effect_container = $("#effects");
     var line_container = $("#lines");
     var chat_container = $("#chat-container");
     var chat_input = $("#chat-id"); 
+    var activity = $("#activity");
     var map_width = 960;
     var map_height = map_width;
     var visible_height = Math.floor(map_height * .75);
     var me = null;
     var markers = [];
     var line_timeouts = {};
+
+    var active_count = 1;
 
     var zones = {
         topleft: {
@@ -87,7 +91,7 @@ $(function(){
 
     function addMarker(id, latitude, longitude, country, city, type, delay){
         var pos = mapCoords(latitude, longitude, map_width, map_height);
-        
+
         var min_distance = 100000;
         var min_index = -1;
         for(var i = 0; i < markers.length; i++){
@@ -99,6 +103,9 @@ $(function(){
                 }
             }
         }
+
+        pos.x = Math.round(pos.x);
+        pos.y = Math.round(pos.y);
         
         if(min_distance > MIN_DIST){
 
@@ -117,8 +124,11 @@ $(function(){
             if(city !== undefined && city.length > 0){
                 label += city;
             }
-            if(country !== undefined && country.length > 0){
-                label += ", " + country;
+            if(country !== undefined && country.length > 0){i
+                if(label.length > 0){
+                    label += ", ";
+                }
+                label += country;
             }
 
             if(label.length === 0 && type === "me"){
@@ -126,6 +136,7 @@ $(function(){
             }
 
             var point = $("<div class='point " + type + "' id='" + id + "' data-layer='" + layer + "' style='left:" + pos.x + "px;top:" + (pos.y - 40) + "px; z-index:" + layer + ";'><div class='count'>0</div><div class='info'>" + label + "</div></div>");
+            
             marker_container.append(point);
 
             point.on("mouseover", function(){
@@ -145,7 +156,7 @@ $(function(){
                 point.css("top", pos.y);
             }, delay);
 
-            markers.push({id:id, pos: pos, type:type, count: 1, contains:[]});
+            markers.push({id:id, pos: pos, type:type, count: 1, contains:[id]});
             
             if(type != "old"){
                 addLine(id, pos);
@@ -153,16 +164,36 @@ $(function(){
 
         }else{
 
-            var label = ", archived visits";
             var marker = markers[min_index];
-
-            if(marker.type === "active"){
-                label = ", active visitors";
-            }
+           
             marker.count += 1;
             marker.contains.push(id);
             
-            $("#"+marker.id + " .count").addClass("active").html("<span>" + marker.count + label + "</span>");
+            if(type === "active"){
+                addJoinEffect(marker.pos);
+            }
+            
+            updateMarkerCount(marker);
+        }
+    }
+    
+    function updateMarkerCount(marker){
+        var label = " archived visits";
+
+        if(marker.type === "active"){
+            label = " active visitors";
+        }
+        var marker_el = $("#" + marker.id + " .count");
+
+        if(marker_el.length > 0){
+        
+            if(marker.count > 1){
+                marker_el.addClass("active");
+            }else{
+                marker_el.removeClass("active");
+            }
+
+            marker_el.html("<span>" + marker.count + label + "</span>");
         }
     }
 
@@ -190,6 +221,38 @@ $(function(){
     function rotateStr(deg){
         return "-moz-transform:translateZ(0) rotate(" + deg + "deg);-webkit-transform:translateZ(0) rotate(" + deg + "deg);-o-transform:translateZ(0) rotate(" + deg + "deg);-ms-transform:translateZ(0) rotate(" + deg + "deg);transform:translateZ(0) rotate(" + deg + "deg)";
  
+    }
+
+    function addLeaveEffect(pos){
+         
+        var point = $("<div class='point old placed' style='opacity:1;left:" + pos.x + "px;top:" + pos.y + "px;z-index:1;'></div>");
+        effect_container.append(point);
+        point.removeClass("placed");
+
+        setTimeout(function(){
+            point.css("top", pos.y - 50);
+            point.css("opacity", 0);
+        }, 50);
+
+        setTimeout(function(){
+            point.remove();
+        }, 500);
+
+    }
+
+    function addJoinEffect(pos){
+        var point = $("<div class='point active' style='left:" + pos.x + "px;top:" + (pos.y - 50) + "px;z-index:1;'></div>");
+        effect_container.append(point);
+
+        setTimeout(function(){
+            point.css("top", pos.y);
+            point.css("opacity", 1);
+        }, 50);
+
+        setTimeout(function(){
+            point.remove();
+        }, 500);
+
     }
 
     function addLine(id, pos){
@@ -223,32 +286,51 @@ $(function(){
     }
 
     function deleteMarker(id){
-        
-        $("#" + id).fadeOut(300, function(){
-            $(this).remove();
-        });
 
-        $("#line_" + id).removeClass("active");
+        var marker_el = $("#" + id);  
+        marker_el.removeClass("placed");
+        marker_el.css("top", marker_el.offset().top - 50);
+
+        var line_el = $("#line_" + id); 
+        line_el.removeClass("active");
         setTimeout(function(){
-            $("#line_" + id).remove();   
-        }, 400);
+            line_el.remove();   
+            marker_el.remove();
+        }, 500);
     }
 
     function removeMarker(id){
-        for(var i = 0; i < markers.length; i++){
-            if(markers[i].id === id && markers[i].contains.length === 0){
-                markers[i].splice(i, 1);
-                deleteMarker(id);
-                return;
-            }
-
+        var pos;
+        for(var i = 0; i < markers.length; i++){ 
             for(var j = 0; j < markers[i].contains.length; j++){
                 if(id === markers[i].contains[j]){
-                    markers[i].contains.splice(j, 1);
+
+                    var marker = markers[i];
+
+                    marker.count = marker.count - 1;
+                    updateMarkerCount(marker);
+
+                    marker.contains.splice(j, 1);
+                    
+                    if(marker.contains.length === 0){
+                        deleteMarker(marker.id);
+                        markers.splice(i, 1);
+                    }else{
+                        addLeaveEffect(marker.pos);
+                    }
+
                     return;
                 }
             }
         }
+    }
+
+    function updateActiveCount(){
+        var label = active_count + " Active user";
+        if(active_count > 1){
+            label += "s";
+        }
+        activity.html(label);
     }
 
     function containedIn(id){
@@ -312,7 +394,6 @@ $(function(){
     channel.onmessage = function(evt){
         try{
             var msg = JSON.parse(evt.data);
-            console.log("received message:"+msg.id);
             say(msg.id, msg.msg);
         }catch(e){}
     }
@@ -330,13 +411,20 @@ $(function(){
                 case "active":
                     if(msg.items){
                         addMarkers(msg.items, "active");
+                        active_count = msg.items.length;
+                        updateActiveCount();
                     }
+                    
                 break;
                 case "join":
                     addMarker(msg.id, msg.latitude, msg.longitude, msg.country, msg.city, "active");
+                    active_count += 1;
+                    updateActiveCount();
                 break;
                 case "leave":
                     removeMarker(msg.id);
+                    active_count -= 1;
+                    updateActiveCount();
                 break;
             }
         }catch(e){}
