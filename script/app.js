@@ -1,5 +1,9 @@
 $(function(){
 
+    /*
+     * TODO: hover info on you + on single active
+    * */
+
     var HYDNA_DOMAIN = "lol.hydna.org";
     var MIN_DIST = 5;
     var MIN_LINE_DIST = 20;
@@ -76,15 +80,10 @@ $(function(){
     }
 
     function mapCoords(latitude, longitude, w, h){
-        // get x value
         var x = (longitude + 180.0) * (w / 360.0);
-        // convert from degrees to radians
         var latRad = latitude * Math.PI / 180.0;
-
-        // get y value
         var mercN = Math.log(Math.tan((Math.PI / 4) + (latRad / 2)));
         var y = (h / 2) - (w * mercN / (2 * Math.PI));
-
         return {x:x, y:y};
     }
 
@@ -124,7 +123,8 @@ $(function(){
             if(city !== undefined && city.length > 0){
                 label += city;
             }
-            if(country !== undefined && country.length > 0){i
+
+            if(country !== undefined && country.length > 0){
                 if(label.length > 0){
                     label += ", ";
                 }
@@ -183,10 +183,11 @@ $(function(){
         if(marker.type === "active"){
             label = " active visitors";
         }
+
         var marker_el = $("#" + marker.id + " .count");
 
         if(marker_el.length > 0){
-        
+
             if(marker.count > 1){
                 marker_el.addClass("active");
             }else{
